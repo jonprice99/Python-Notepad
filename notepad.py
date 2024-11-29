@@ -14,7 +14,7 @@ RESIZE_SETTING = 0
 
 root = Tk()
 menu_bar = Menu(root)
-text_area = Text(root, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE))
+text_area = Text(root, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), undo = True, wrap = "word")
 
 # Function to build the app's menu system
 def build_menu():
