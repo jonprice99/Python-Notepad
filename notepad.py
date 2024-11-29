@@ -13,8 +13,10 @@ DEFAULT_FONT_SIZE = 12
 RESIZE_SETTING = 0
 
 root = Tk()
+frame = Frame(root)
+frame.pack(expand = True, fill = 'both')
 menu_bar = Menu(root)
-text_area = Text(root, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), undo = True, wrap = "word")
+text_area = Text(frame, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), undo = True, wrap = "word")
 
 # Function to build the app's menu system
 def build_menu():
@@ -29,14 +31,14 @@ def build_menu():
     
     # Add the Edit Menu and its components
     edit_menu = Menu(menu_bar, tearoff=False, activebackground='DodgerBlue')
-    edit_menu.add_command(label='Copy', command=copy_text)
-    edit_menu.add_command(label='Cut', command=cut_text)
-    edit_menu.add_command(label='Paste', command=paste_text)
+    edit_menu.add_command(label='Copy (Ctrl + C)', command=copy_text)
+    edit_menu.add_command(label='Cut (Ctrl + X)', command=cut_text)
+    edit_menu.add_command(label='Paste (Ctrl + V)', command=paste_text)
     edit_menu.add_separator()
-    edit_menu.add_command(label="Undo", command=undo_text)
-    edit_menu.add_command(label="Redo", command=redo_text)
+    edit_menu.add_command(label="Undo (Ctrl + Z)", command=undo_text)
+    edit_menu.add_command(label="Redo (Ctrl + Y)", command=redo_text)
     edit_menu.add_separator()
-    edit_menu.add_command(label='Select All', command=select_all)
+    edit_menu.add_command(label='Select All (Ctrl + A)', command=select_all)
     menu_bar.add_cascade(label="Edit", menu=edit_menu)
     
     # Add the Help Menu and its components
@@ -53,9 +55,9 @@ def build_menu():
     root.bind(sequence = "<Control-q>", func = quit_app)
 
 def build_text_area():
-    text_area.grid(sticky=NSEW)
-    scroller = Scrollbar(text_area, orient=VERTICAL)
-    scroller.pack(side=RIGHT, fill=Y)
+    text_area.pack(side='left', expand=True, fill='both', padx=(0, 0))
+    scroller = Scrollbar(frame, orient=VERTICAL)
+    scroller.pack(side=RIGHT, fill=BOTH)
     scroller.config(command=text_area.yview)
     text_area.config(yscrollcommand=scroller.set)
 
