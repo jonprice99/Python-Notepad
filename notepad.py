@@ -6,6 +6,8 @@ import tkinter.messagebox as mb
 
 from PIL import Image, ImageTk
 
+from datetime import datetime
+
 UNTITLED_STRING = "Untitled - Notepad"
 WINDOW_SIZE = "800x500"
 DEFAULT_FONT = "Times New Roman"
@@ -39,6 +41,9 @@ def build_menu():
     edit_menu.add_command(label="Redo (Ctrl + Y)", command=redo_text)
     edit_menu.add_separator()
     edit_menu.add_command(label='Select All (Ctrl + A)', command=select_all)
+    edit_menu.add_separator()
+    edit_menu.add_command(label="Insert Date", command=insert_date)
+    edit_menu.add_command(label="Insert Date & Time", command=insert_date_and_time)
     menu_bar.add_cascade(label="Edit", menu=edit_menu)
     
     # Add the Help Menu and its components
@@ -144,6 +149,18 @@ def about_notepad():
 # Function to quit the app
 def quit_app(event=None):
     root.destroy()
+
+# Function to insert the current date into the document
+def insert_date():
+    curr_date = datetime.now()
+    formatted_date = curr_date.strftime("%B %d, %Y \n")
+    text_area.insert(END, formatted_date)
+
+# Function to insert the current date into the document
+def insert_date_and_time():
+    curr_date = datetime.now()
+    formatted_date = curr_date.strftime("%B %d, %Y %I:%M:%S %p \n")
+    text_area.insert(END, formatted_date)
 
 # Function to display info about app features/commands
 def about_commands():
