@@ -8,11 +8,17 @@ from PIL import Image, ImageTk
 
 from datetime import datetime
 
+import configparser
+
+# Create a ConfigParser object & read the config.ini file 
+config = configparser.ConfigParser() 
+config.read('config.ini')
+
 UNTITLED_STRING = "Untitled - Notepad"
-WINDOW_SIZE = "650x500"
-DEFAULT_FONT = "Consolas"
-DEFAULT_FONT_SIZE = 11
-RESIZE_SETTING = 1
+WINDOW_SIZE = config['DEFAULT']['WindowSize']
+DEFAULT_FONT = config['DEFAULT']['DefaultFont']
+DEFAULT_FONT_SIZE = config['DEFAULT']['DefaultFontSize']
+RESIZE_SETTING = config['DEFAULT']['ResizableWindow']
 
 root = Tk()
 frame = Frame(root)
@@ -59,10 +65,13 @@ def build_menu():
     root.bind(sequence = '<Control-o>', func = open_file)
     root.bind(sequence = "<Control-n>", func = open_new_file)
     root.bind(sequence = "<Control-s>", func = save_file)
-    root.bind(sequence = "<Control-q>", func = quit_app)
+    root.bind(sequence = "<Control-q>", func = clean_up)
     root.bind(sequence = "<F1>", func=about_commands)
     root.bind(sequence = "<F5>", func=insert_date)
     root.bind(sequence = "<F6>", func=insert_date_and_time)
+    
+    # Handle window close event
+    root.protocol("WM_DELETE_WINDOW", clean_up)
 
 def build_text_area():
     text_area.grid(row=0, column=0, sticky="nsew")
@@ -92,6 +101,22 @@ def initialize():
     root.update()
     root.mainloop()
 
+# Function to check for unsaved changes to document
+def check_if_unsaved():
+    if text_area.edit_modified():
+        response = mb.askyesnocancel("Unsaved Changes", "You have unsaved changes. Do you want to save them?")
+        
+        if response:
+            if save_file() == "":
+                return False
+        return response != None
+    return True
+
+# Function to handle clean-up on closing the app
+def clean_up(event=None):
+    if check_if_unsaved():
+        quit_app()
+
 # Function to create a new file
 def open_new_file():
     root.title(UNTITLED_STRING)
@@ -107,7 +132,8 @@ def open_file(event=None):
         
         # Load the existing file contents into the window 
         with open(file, mode='r') as file_temp: 
-            text_area.insert(1.0, file_temp.read()) 
+            text_area.insert(1.0, file_temp.read())
+        text_area.edit_modified(False)
     else: 
         file = None
 
@@ -122,6 +148,10 @@ def save_file(event=None):
         with open(file_path, "w") as file: 
             file.write(file_content) 
             root.title(f"{os.path.basename(file_path)} ({file_path}) - Notepad")
+            text_area.edit_modified(False)
+    
+    # Return the file path or empty string to check if save was aborted
+    return file_path
 
 # Function to select all text
 def select_all():
@@ -152,7 +182,7 @@ def about_notepad():
     mb.showinfo("About Notepad", "A basic Notepad written in Python without pesky, unwanted features.")
 
 # Function to quit the app
-def quit_app(event=None):
+def quit_app():
     root.destroy()
 
 # Function to insert the current date into the document
