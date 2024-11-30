@@ -9,14 +9,16 @@ from PIL import Image, ImageTk
 from datetime import datetime
 
 UNTITLED_STRING = "Untitled - Notepad"
-WINDOW_SIZE = "800x500"
-DEFAULT_FONT = "Times New Roman"
-DEFAULT_FONT_SIZE = 12
-RESIZE_SETTING = 0
+WINDOW_SIZE = "650x500"
+DEFAULT_FONT = "Consolas"
+DEFAULT_FONT_SIZE = 11
+RESIZE_SETTING = 1
 
 root = Tk()
 frame = Frame(root)
 frame.pack(expand = True, fill = 'both')
+frame.grid_rowconfigure(0, weight=1)
+frame.grid_columnconfigure(0, weight=1)
 menu_bar = Menu(root)
 text_area = Text(frame, font=(DEFAULT_FONT, DEFAULT_FONT_SIZE), undo = True, wrap = "word")
 
@@ -42,8 +44,8 @@ def build_menu():
     edit_menu.add_separator()
     edit_menu.add_command(label='Select All (Ctrl + A)', command=select_all)
     edit_menu.add_separator()
-    edit_menu.add_command(label="Insert Date", command=insert_date)
-    edit_menu.add_command(label="Insert Date & Time", command=insert_date_and_time)
+    edit_menu.add_command(label="Insert Date (F5)", command=insert_date)
+    edit_menu.add_command(label="Insert Date & Time (F6)", command=insert_date_and_time)
     menu_bar.add_cascade(label="Edit", menu=edit_menu)
     
     # Add the Help Menu and its components
@@ -58,12 +60,15 @@ def build_menu():
     root.bind(sequence = "<Control-n>", func = open_new_file)
     root.bind(sequence = "<Control-s>", func = save_file)
     root.bind(sequence = "<Control-q>", func = quit_app)
+    root.bind(sequence = "<F1>", func=about_commands)
+    root.bind(sequence = "<F5>", func=insert_date)
+    root.bind(sequence = "<F6>", func=insert_date_and_time)
 
 def build_text_area():
-    text_area.pack(side='left', expand=True, fill='both', padx=(0, 0))
+    text_area.grid(row=0, column=0, sticky="nsew")
     scroller = Scrollbar(frame, orient=VERTICAL)
-    scroller.pack(side=RIGHT, fill=BOTH)
     scroller.config(command=text_area.yview)
+    scroller.grid(row=0, column=1, sticky="ns")
     text_area.config(yscrollcommand=scroller.set)
 
 # Initialize the text editor window
@@ -151,19 +156,19 @@ def quit_app(event=None):
     root.destroy()
 
 # Function to insert the current date into the document
-def insert_date():
+def insert_date(event=None):
     curr_date = datetime.now()
     formatted_date = curr_date.strftime("%B %d, %Y \n")
     text_area.insert(END, formatted_date)
 
 # Function to insert the current date into the document
-def insert_date_and_time():
+def insert_date_and_time(event=None):
     curr_date = datetime.now()
     formatted_date = curr_date.strftime("%B %d, %Y %I:%M:%S %p \n")
     text_area.insert(END, formatted_date)
 
 # Function to display info about app features/commands
-def about_commands():
+def about_commands(event=None):
    commands = """
     Under the File Menu:
     - 'New' clears the entire Text Area
@@ -175,7 +180,9 @@ def about_commands():
     - 'Cut' cuts the selected text & removes it from the text area
     - 'Paste' pastes the copied/cut text
     - 'Select All' selects the entire text
-    - 'Delete' deletes the last character 
+    - 'Delete' deletes the last character
+    - 'Insert Date' puts the date on the current line
+    - 'Insert Date & Time' same as 'Insert Date' but with time
     """
    mb.showinfo(title="All Commands", message=commands)
 
